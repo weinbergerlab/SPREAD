@@ -13,14 +13,16 @@ Posrate <- as.numeric(spread_RSVposrate[,grep("RSV",colnames(spread_RSVposrate))
 
 cor.test(Bronchiolitis,RSV) # 0.9729342 P<0.001
 
-plot(Bronchiolitis,type="l",xlab="week",bty="l")
+plot(Bronchiolitis,type="l",xlab="week",bty="l",xaxt="n")
 lines(RSV,col="red")
 lines(Posrate*Bronchiolitis/100,col="blue",lty=2)
 legend(35,300, legend=c("Bronchiolitis","RSV","Pos*Bro"),
        col=c("black", "red","blue"),lty=c(1,1,2),cex=0.5,box.lty=0)
 legend(18,300, legend=c("correlation=0.8", "P<0.0001"),
        col=c("black"),cex=0.5,box.lty=0)
-axis(1, at=seq(1,48,), labels=)
+axis(1, at=seq(3,48,4.3), labels=c("May","Jun","Jul","Aug",
+                                 "Sep","Oct","Nov","Dec",
+                                 "Jan","Feb","Mar"))
 
 plot(Test/Bronchiolitis,type="l",col="blue",lty=2,xlab="week",ylim=c(0,1))
 lines(Posrate/100,col="purple",lty=2)
