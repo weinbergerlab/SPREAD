@@ -94,6 +94,14 @@ ui <- fluidPage(
                        "Duration of maternal immunity (days):",
                        min = 0, max = 150, value = 90, step=1
            ),
+           sliderInput("virus_import",
+                       "Time at virus importation:",
+                       min = 159, max = 171, value = 159, step=1
+           ),
+           sliderInput("I_ex",
+                       "Amount of virus importation (per 1 million people per week):",
+                       min = 0, max = 100, value = 0, step=5
+           ),
            hr(),
            
     )
@@ -114,42 +122,19 @@ ui <- fluidPage(
     ),
     
     mainPanel(
-      navbarPage("Output:",
-                 
-                 tabPanel("Seasonal Epidemics",
       fluidPage(
       fluidRow(
-        h3("Seasonal RSV Epidemics without interuption"),
-        p(HTML("Simulate the natural course of RSV epidemic in Dutch population without any interventions.")),
-        plotOutput("distPlot")
+        h3("Predicted RSV cases by clinical outcome"),
+        p(HTML("Simulate the natural course of RSV epidemic in a single population without any interventions.")),
+        plotlyOutput("distPlot")
         ),
-      br())),
-      tabPanel("Re-emergent Epidemics",
-               fluidPage(
-                 fluidRow(
-                   h3("Simulated RSV activites after re-introduction"),
-                   p(HTML("Simulate the change in the time course of RSV cases after intervention and virus re-introduction")),
-                   plotlyOutput("plotInt"),
-                   br(),
-                   br(),
-                     wellPanel(
-                     h4(div(HTML("<em>Set intervention parameters...</em>"))),
-                     column(width=6,
-                            numericInput("Tint","Duration of Intervention (weeks):",value = 52, min = 0, step = 1)
-                     ),
-                     column(width=6,
-                            numericInput("virus_import",
-                                 "Time at virus importation (weeks):",value = 53, min = 0, step=1)),
-                     sliderInput("I_ex",
-                                 "Amount of virus importation (per 1 million people per week):",
-                                 min = 0, max = 100, value = 0, step=5
-                     ),
-                     p(HTML("<b>Intervention type: reducing transmission, </b> for example via social distancing or travel restriction.")),
-                     sliderInput("s1", "Reduction in transmission from infections ", 0, 100, 30, pre="%",step=1, animate=TRUE),
-                   p(HTML("<b>User instructions:</b> The graph shows the expected numbers of individuals over time who are infected over time, with and without an intervention, with and without virus importation. A more detailed description of the model is provided in the Model Description tab. The population size, initial condition, and parameter values used to simulate the spread of infection can be specified through the sliders located in the left-hand panel. Default slider values are equal to estimates taken from the literature (see Sources tab). The strength and timing of the intervention is controlled by the sliders below the plot."))
-                 )
-               )
-      )),
+      br(),
+      fluidRow(
+        # Dynamic valueBoxes
+        valueBoxOutput("progressBox", width = 3),
+        valueBoxOutput("approvalBox", width = 3),
+        valueBoxOutput("BRRBox", width = 3)
+      ),
       br(),
       br()
     )

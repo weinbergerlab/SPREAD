@@ -46,7 +46,7 @@ server <- function(input, output) {
         period=53,
         omega=1/(input$DurationMatImmunityDays/length.step),
         B_m=input$B_m,
-        death.rate=input$death.rate,
+        death.rate=0.00018,
         lockdown=input$lockdown,
         virus_import=input$virus_import,
         I_ex=input$I_ex)

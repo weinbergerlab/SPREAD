@@ -51,7 +51,7 @@ server <- function(input, output) {
         virus_import=input$virus_import,
         I_ex=input$I_ex)
     ## Time frame
-    times      <- seq(0, input$timeframe, by = 1)
+    times      <- seq(1, input$timeframe, by = 1)
     
     ## Solve using ode (General Solver for Ordinary Differential Equations)
     out <- ode(
@@ -64,57 +64,20 @@ server <- function(input, output) {
     as.data.frame(out)
   })
   
-  output$distPlot <- renderPlot({
-    out <-
-      dataInput() %>%
-      select(time,I1,I2,I3,I4) %>% 
-      mutate(Total_I = rowSums(select(.,-time)))%>%
-      select(time,Total_I) %>%
-      gather(key, value, -time) %>%
-      mutate(
-        id = row_number(),
-        key2 = recode(
-          key,
-          Total_I = "Total infections"
-        )
-      )
+  output$distPlot <- renderPlotly({
+    out <-dataInput() %>%
+      select(I1,I2,I3,I4) %>% 
+      rowSums()
+    InfectionPlot <- data.frame("Total_I"=round(out),
+                                date=dates)
     
-    ggplot(data = out, aes(
-      x = time,
-      y = value,
-      color=key2,
-      label = key2,
-      data_id = id)) + 
-      ylab("Number of Infectious Individuals") + xlab("Time (Weeks)") +
-      geom_line(size = 1) +
-      geom_text_repel(
-        data = subset(out, time == max(time)),
-        aes(label = key2),
-        size = 6,
-        segment.size  = 0.2,
-        segment.color = "grey50",
-        nudge_x = 0,
-        hjust = -1,
-        vjust= -1.5,
-        direction = "y"
-      )  +
-      theme(legend.position = "none") +
-      scale_colour_brewer(palette = "Set1") +
-      theme(
-        rect=element_rect(size=0),
-        legend.position="none",
-        panel.background=element_rect(fill="transparent", colour=NA),
-        plot.background=element_rect(fill="transparent", colour=NA),
-        legend.key = element_rect(fill = "transparent", colour = "transparent")
-      )
-    
-    p2 <- ggplot(data = out[out$key=="Total_I"&out$time>159&out$time<159+18,], aes(
-      x = time,
-      y = value,
-      label = key2,
-      data_id = id)) + 
-      ylab("Number of Infectious Individuals") + xlab("Time (Weeks)") +
-      geom_line(size = 1)+theme_classic() 
+    plot_ly(InfectionPlot, type = 'scatter', mode = 'lines')%>%
+      add_trace(x = ~date, y = ~Total_I, name = 'Total infected individuals')%>%
+      layout(showlegend = F)%>%
+      layout(legend=list(title=list(text='variable')),
+             yaxis = list(title = 'Total Infected Inviduals',showgrid = FALSE,showline= T),
+             xaxis = list(dtick = "M1",
+                          ticklabelmode="period",showgrid = FALSE,showline= T))
 
   })
   
