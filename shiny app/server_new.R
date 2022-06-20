@@ -140,11 +140,18 @@ server <- function(input, output) {
       select(I1,I2,I3,I4) %>% 
       rowSums()
     InfectionPlot_Intervention <- data.frame("Total_I"=round(out_Intervention),
-                                       date=dates)
+                                       date=dates,Intervention="Lock Down")
+    
+    out_Normal <-simMSIS_Normal() %>%
+      select(I1,I2,I3,I4) %>% 
+      rowSums()
+    InfectionPlot_Normal <- data.frame("Total_I"=round(out_Normal),
+                                       date=dates,Intervention="No Intervention")
+    
+    InfectionPlot_Intervention <- rbind(InfectionPlot_Intervention,InfectionPlot_Normal)
     
     plot_ly(InfectionPlot_Intervention, type = 'scatter', mode = 'lines')%>%
-      add_trace(x = ~date, y = ~Total_I, name = 'Total infected individuals')%>%
-      layout(showlegend = F)%>%
+      add_trace(x = ~date, y = ~Total_I, color=~Intervention,name = ~Intervention,colors=c("#a50f15","#fc9272"))%>%
       layout(legend=list(title=list(text='variable')),
              yaxis = list(title = 'Total Infected Inviduals',showgrid = FALSE,showline= T),
              xaxis = list(dtick = "M1",
