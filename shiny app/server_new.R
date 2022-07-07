@@ -120,6 +120,7 @@ server <- function(input, output) {
   })
   
   output$Plot_Normal <- renderPlotly({
+    dates <- seq(as.Date("2018-12-07"), length=input$timeframe, by="weeks")
     out_Normal <-simMSIS_Normal() %>%
       select(I1,I2,I3,I4) %>% 
       rowSums()
@@ -136,6 +137,7 @@ server <- function(input, output) {
   })
   
   output$Plot_Intervention <- renderPlotly({
+    dates <- seq(as.Date("2018-12-07"), length=input$timeframe, by="weeks")
     out_Intervention <-simMSIS_Intervention() %>%
       select(I1,I2,I3,I4) %>% 
       rowSums()
