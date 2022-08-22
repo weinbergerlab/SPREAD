@@ -209,6 +209,7 @@ server <- function(input, output) {
     as.data.frame(tail(out_Intervention,input$timeframe))
   })
   
+<<<<<<< HEAD
   output$Plot_flex <- renderPlotly({
     library(xts)
     dates <- seq(as.Date("2018-12-07"), length=input$timeframe, by="weeks")
@@ -221,6 +222,12 @@ server <- function(input, output) {
     I_incidence=rep(0,length=input$timeframe)#Incidence of infection
     total_Pop <- simMSIS_flex() %>%
       select(-time)%>%
+=======
+  output$Plot_Normal <- renderPlotly({
+    dates <- seq(as.Date("2018-12-07"), length=input$timeframe, by="weeks")
+    out_Normal <-simMSIS_Normal() %>%
+      select(I1,I2,I3,I4) %>% 
+>>>>>>> 51124db400ef274946e55d586390b7a1993cb19e
       rowSums()
     for (t in 1:input$timeframe)
     {
@@ -249,6 +256,7 @@ server <- function(input, output) {
   })
   
   output$Plot_Intervention <- renderPlotly({
+<<<<<<< HEAD
     library(xts)
     dates <- seq(as.Date("2018-12-07"), length=input$timeframe, by="weeks")
     
@@ -262,6 +270,14 @@ server <- function(input, output) {
     H_incidence_2=rep(0,length=input$timeframe)#Incidence of infection
     H_incidence_3=rep(0,length=input$timeframe)#Incidence of infection
     H_incidence_4=rep(0,length=input$timeframe)#Incidence of infection
+=======
+    dates <- seq(as.Date("2018-12-07"), length=input$timeframe, by="weeks")
+    out_Intervention <-simMSIS_Intervention() %>%
+      select(I1,I2,I3,I4) %>% 
+      rowSums()
+    InfectionPlot_Intervention <- data.frame("Total_I"=round(out_Intervention),
+                                       date=dates,Intervention="Lock Down")
+>>>>>>> 51124db400ef274946e55d586390b7a1993cb19e
     
     total_Pop <- simMSIS_Intervention() %>%
       select(-time)%>%
