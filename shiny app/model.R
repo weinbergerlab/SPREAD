@@ -2,18 +2,13 @@
 msis <- function(time, state, parameters) {
   with(as.list(c(state, parameters)), {
     
-    if(lockdown==TRUE&time>106&time<159){
-        beta_t=0
-    }else{beta_t=beta}
+          I_ex_t=I_ex*airtravel[time]/100000
     
-    if(time>=virus_import){
-      I_ex_t=I_ex
-    }else{I_ex_t=0}
-    
-    seasonal.txn <- (1+b1*cos(2*pi*(time-phi*period)/period))# seasonality waves
+   seasonal.txn <- (1+b1*cos(2*pi*(time-phi*period)/period))# seasonality waves
+   # 
     infectiousN <- I1 + rho1*I2 +rho2*I3 + rho2*I4 +rho2*I_ex_t
-    lambda <- beta_t*seasonal.txn*infectiousN/sum(state)
-    period.birth.rate <- exp(B_m/4.345)-1
+    lambda <- seasonal.txn*tau*contact*infectiousN/sum(state)
+    period.birth.rate <- exp(B_m[time]/sum(state)/4.345)-1
     
     #Pull out the states  for the model
     M <-  state['M']

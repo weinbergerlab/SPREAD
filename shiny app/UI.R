@@ -31,9 +31,9 @@ ui <- fluidPage(
                
                setSliderColor(c(rep("#b2df8a", 3)), sliderId=c(8,9,10)),
                h4(div(HTML("<em>Set fixed parameters...</em>"))),
-               sliderInput("B_m",
-                           "Per capita births rate (months):",
-                           min = 0, max = 0.001, value = 0.0008, step=0.0001
+               sliderInput("Mu_m",
+                           "Per capita death rate (months):",
+                           min = -0.001, max = 0.001, value = 0.0002, step=0.0001
                ),
                sliderInput("infdur1",
                            "Infectious duration of the 1st infection (days):",
@@ -74,21 +74,26 @@ ui <- fluidPage(
         column(width=6,
                
                h4(div(HTML("<em>Set transmission parameters...</em>"))),
-               sliderInput("R0",
-                           "Basic reproductive number (R0, # persons):",
-                           min = 0, max = 20, value = 10.035, step=0.01
+               sliderInput("tau",
+                           "Probability of infection given contact between a susceptible and infected individual:",
+                           min = 0, max = 1, value = 0.6, step=0.01
                ),
                sliderInput("contactrate",
                            "Average rate of contact between susceptible and infected individuals (per week):",
-                           min = .5, max = 20, value = 10
+                           min = .5, max = 30, value = 10
                ),
                sliderInput("amp",
                            "Amplitude of transmission seasonality:",
-                           min = 0, max = 2, value = 0.35, step=0.01
+                           0, 100, 25, step=1, post="%"
                ),
+               radioButtons("AllowReset", "Existing immunity wanes during lockdown?",
+                            choices = list("Yes" = "Yes","No" = "No"),inline=TRUE, selected="No"),
+               # conditionalPanel(
+               #   condition="input.AllowSeason == 'Yes'",
+               #   sliderInput("seas.amp", "Amplitude of seasonality", 0, 100, 0, step=1, post="%")),
                sliderInput("phase",
                            "Peak timing of transmission seasonality:",
-                           min = 0, max = 3.14, value = 1.53, step=0.01
+                           min = 0, max = 2*pi, value = 1.96, step=0.01
                ),
                sliderInput("DurationMatImmunityDays",
                            "Duration of maternal immunity (days):",
@@ -101,15 +106,18 @@ ui <- fluidPage(
       h4(div(HTML("<em>Set simulation values...</em>"))),
       fluidRow(
         column(width=6,
-               numericInput("popsize", div(HTML("Population size (millions):")), value=10, max=300, min=1, step=1)
+               numericInput("popsize", div(HTML("Initial population size (Millions):")), value=10, max=300, min=1, step=10)
         ),
         column(width=6,
-               numericInput("pinf","Initial # infected:",value = 100, min = 1, step = 1)
+               numericInput("pinf","Initial # infected:",value = 1, min = 1, step = 1)
+        ),
+        sliderInput("I_ex",
+                    "Amount of virus importation (per 1 million people per week):",
+                    min = 0, max = 100, value = 10, step=1
         )),
       #br(),
       
       sliderInput("timeframe", div(HTML("Maximum time")),0, 600, 318, step=10, post=" weeks"),
-      checkboxInput("lockdown", "Lockdown", FALSE), 
       width=4
     ),
     
@@ -122,9 +130,31 @@ ui <- fluidPage(
                             fluidRow(
                               h3("Seasonal RSV Epidemics without interuption"),
                               p(HTML("Simulate the natural course of RSV epidemic in Dutch population without any interventions.")),
-                              plotlyOutput("Plot_Normal")
+                              plotlyOutput("Plot_flex"),
+                              br(),
+                              br(),
+                              wellPanel(
+                                h4(div(HTML("<em>Set clinical parameters...</em>"))),
+                                sliderInput(
+                                  "hosp1","Risk of hospitalization of the first time infection:",value = 0.14, min = 0,max=0.2, step = 0.001
+                                ),
+                                # p(HTML("<b>Reference: The Natural History of Respiratory Syncytial Virus in a Birth Cohort: The Influence of Age and Previous Infection on Reinfection and Disease, 2012, E. O. Ohuma at al.")),
+                                sliderInput("hosp2",
+                                            "Risk of hospitalization of the second time infection:",value = 0.048, min = 0,max=0.1, step=0.001),
+                                sliderInput("hosp3",
+                                            "Risk of hospitalization of subsequent infection:",
+                                            value = 0.01, min = 0,max=0.1, step=0.001),
+                                sliderInput("Report",
+                                            "Reporting fraction:",
+                                            min = 0, max = 1, value = 0.8, step=0.05
+                                )
+                                #p(HTML("<b>Reference: Epidemiology of respiratory syncytial virus in a community birth cohort of infants in the first 2 years of life, 2021, Mari D. Takashima at al.")),
+                                # 
+                                # p(HTML("<b>User instructions:</b> The graph shows the expected incidence of RSV hospitalization over time without an covid-19 pandemic. A more detailed description of the model is provided in the Model Description tab. The population size, initial condition, and parameter values used to simulate the spread of infection can be specified through the sliders located in the left-hand panel. Default slider values are equal to estimates taken from the literature (see Sources tab). The strength and timing of the intervention is controlled by the sliders below the plot."))
+                              ),
+                         )
+                            )
                             ),
-                            br())),
                  tabPanel("Re-emergent Epidemics",
                           fluidPage(
                             fluidRow(
@@ -135,18 +165,11 @@ ui <- fluidPage(
                               br(),
                               wellPanel(
                                 h4(div(HTML("<em>Set intervention parameters...</em>"))),
-                                column(width=6,
-                                       numericInput("Tint","Duration of Intervention (weeks):",value = 52, min = 0, step = 1)
-                                ),
-                                column(width=6,
-                                       numericInput("virus_import",
-                                                    "Time at virus importation (weeks):",value = 53, min = 0, step=1)),
-                                sliderInput("I_ex",
-                                            "Amount of virus importation (per 1 million people per week):",
-                                            min = 0, max = 100, value = 0, step=5
+                                sliderInput(
+                                       "Tint","Duration of Intervention (weeks):",value = 52, min = 0,max=100, step = 1
                                 ),
                                 p(HTML("<b>Intervention type: reducing transmission, </b> for example via social distancing or travel restriction.")),
-                                sliderInput("s1", "Reduction in transmission from infections ", 0, 100, 30, pre="%",step=1, animate=TRUE),
+                                sliderInput("TD", "Reduction in transmission from infections ", min = 0, max = 100, value = 30, post="%",step=1, animate=TRUE),
                                 p(HTML("<b>User instructions:</b> The graph shows the expected numbers of individuals over time who are infected over time, with and without an intervention, with and without virus importation. A more detailed description of the model is provided in the Model Description tab. The population size, initial condition, and parameter values used to simulate the spread of infection can be specified through the sliders located in the left-hand panel. Default slider values are equal to estimates taken from the literature (see Sources tab). The strength and timing of the intervention is controlled by the sliders below the plot."))
                               )
                             )
