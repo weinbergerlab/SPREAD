@@ -12,14 +12,13 @@ library("tidyverse")
 library("ggrepel")
 library("shinydashboard")
 
-setwd("/Users/zhezheng/Library/CloudStorage/OneDrive-YaleUniversity/SPREAD study/SPREAD/shiny")
 # can change to location specific age distributions and annual per capita birth rate
 agedist <- readRDS('./data_and_parms/agedist.rds')
 # currently, we have 21 age groups
+N_ages <- 21
 #The <12 month olds, were divided into monthly age classes.
 #The 1-4 year olds, were divided into yearly age classes.
 #The remaining population was divided into 5 classes: 5–9 years, 10–19 years, 20–39 years, 40–59-years, and 60+ years old. 
-N_ages <- 21
 PerCapitaBirthsYear2 <- readRDS('./data_and_parms/PerCapitaBirthsYear.rds')
 c2 <- readRDS( './data_and_parms/c2.rds') # contact matrix
 travel_volumn_NL <- readRDS( './data_and_parms/travel_volumn_NL.rds')
@@ -71,6 +70,7 @@ server <- function(input, output) {
   parameters_flex <-
     list(PerCapitaBirthsYear=as.matrix(PerCapitaBirthsYear2),
          DurationMatImmunityDays=input$DurationMatImmunityDays,
+         N_ages=N_ages,
          WidthAgeClassMonth=WidthAgeClassMonth,
          um=input$Mu_m, # adjust for population increase/decrease
          b1=input$amp,
@@ -261,12 +261,10 @@ output$Plot_population <- renderPlotly({
 
 # Display the model diagram
 output$plot4 <- renderImage({
-  filename <- normalizePath(file.path('./shiny app',"model_diagram.png"))
+  filename <- normalizePath(file.path('./plot',"model_diagram.png"))
   
   list(src = filename, height=500, width=900)
   
 }, deleteFile = FALSE)
 
 }
-# Run the application
-shinyApp(ui = ui, server = server)  
