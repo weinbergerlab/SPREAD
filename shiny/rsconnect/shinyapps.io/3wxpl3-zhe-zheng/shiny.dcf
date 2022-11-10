@@ -5,9 +5,10 @@ account: 3wxpl3-zhe-zheng
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 6823903
-bundleId: 6225969
+bundleId: 6490826
 url: https://3wxpl3-zhe-zheng.shinyapps.io/shiny/
-when: 1661181945.80806
-lastSyncTime: 1661181945.80808
+when: 1667941988.46215
+lastSyncTime: 1667941988.46216
 asMultiple: FALSE
 asStatic: FALSE
+ignoredFiles: median_age_hosp.png|NL.png|Scenarios.png

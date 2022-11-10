@@ -70,7 +70,6 @@ waning_immunity_model <- function(t,y,parms, time.step='month'){
   N.ages <- length(M)
   
   ###Check the standardization of beta and overall structure of lambda here
-  #how does'baseline txn rate' figure in here?
   ##???##################
   seasonal.txn <- (1+parms$b1*cos(2*pi*(t-parms$phi*period)/period))# seasonality waves
   b <- parms$R0*parms$NPIs[t]/ (parms$dur.days1/length.step) # transmission probability per unit time
